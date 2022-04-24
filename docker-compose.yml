@@ -1,0 +1,13 @@
+version: '3'
+
+services:
+  centos-stream-8-pkg-builder:
+    image: centos-stream-8-pkg-builder
+    build:
+      context: build/centos-stream-8/pkg-builder
+    volumes:
+      - ./:/workspace
+      - /dev/kvm:/dev/kvm
+    environment:
+      - INPUT_PACKAGE=${INPUT_PACKAGE}
+    working_dir: /workspace
