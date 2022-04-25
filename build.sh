@@ -27,20 +27,20 @@ docker network create tdx-tools_default || true
 if [ "${1:-}" = "" ]; then
   packages="intel-mvp-spr-qemu-kvm intel-mvp-tdx-libvirt intel-mvp-spr-kernel intel-mvp-tdx-tdvf intel-mvp-tdx-guest-grub2 intel-mvp-tdx-guest-shim"
 else
-  packages=$@
+  packages=$*
 fi
 
 declare -A pids
 for package in $packages; do
   echo "redirecting $package build output to /tmp/$package.log"
   (
-    >/dev/null 2>&1 docker rm -f centos-stream-8-$package || true
+    >/dev/null 2>&1 docker rm -f "centos-stream-8-$package" || true
 
     start=$SECONDS
     export INPUT_PACKAGE=$package
-    >/tmp/$package.log 2>&1 docker-compose --ansi never run --name centos-stream-8-$package centos-stream-8-pkg-builder
-    touch build/centos-stream-8/$package/build.done
-    echo "$package build completed in $(($SECONDS-$start))s"
+    >"/tmp/$package.log" 2>&1 docker-compose --ansi never run --name "centos-stream-8-$package" centos-stream-8-pkg-builder
+    touch "build/centos-stream-8/$package/build.done"
+    echo "$package build completed in $((SECONDS-start))s"
   ) &
   pids[$package]=$!
 done
