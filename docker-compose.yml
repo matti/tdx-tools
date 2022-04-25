@@ -8,6 +8,4 @@ services:
     volumes:
       - ./:/workspace
       - /dev/kvm:/dev/kvm
-    environment:
-      - INPUT_PACKAGE=${INPUT_PACKAGE}
     working_dir: /workspace

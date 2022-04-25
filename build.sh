@@ -5,9 +5,7 @@ _shutdown() {
   echo ""
   echo "SHUTDOWN - please wait"
 
-  (
-    INPUT_PACKAGE="" docker-compose --ansi never stop --timeout 0 || true
-  )
+  docker-compose --ansi never stop --timeout 0 || true
 
   wait
 
@@ -20,9 +18,7 @@ export DOCKER_DEFAULT_PLATFORM=linux/amd64
 # otherwise multiple networks with the same name will appear when docker-compose is launched in parallel
 docker network create tdx-tools_default || true
 
-(
-  INPUT_PACKAGE="" docker-compose --ansi never build centos-stream-8-pkg-builder
-)
+docker-compose --ansi never build centos-stream-8-pkg-builder
 
 if [ "${1:-}" = "" ]; then
   packages="intel-mvp-spr-qemu-kvm intel-mvp-tdx-libvirt intel-mvp-spr-kernel intel-mvp-tdx-tdvf intel-mvp-tdx-guest-grub2 intel-mvp-tdx-guest-shim"
@@ -37,8 +33,7 @@ for package in $packages; do
     >/dev/null 2>&1 docker rm -f "centos-stream-8-$package" || true
 
     start=$SECONDS
-    export INPUT_PACKAGE=$package
-    >"/tmp/$package.log" 2>&1 docker-compose --ansi never run --name "centos-stream-8-$package" centos-stream-8-pkg-builder
+    >"/tmp/$package.log" 2>&1 docker-compose --ansi never run --name "centos-stream-8-$package" -e INPUT_PACKAGE="$package" centos-stream-8-pkg-builder
     touch "build/centos-stream-8/$package/build.done"
     echo "$package build completed in $((SECONDS-start))s"
   ) &
@@ -68,9 +63,18 @@ for package in "${!statuses[@]}"; do
   fi
 done
 
-echo ""
 if [ "$failed" = "yes" ]; then
+  echo ""
   echo "FAIL"
-else
-  echo "OK"
+  exit 1
 fi
+
+docker-compose --ansi never run \
+  --workdir /workspace/build/centos-stream-8 \
+  --entrypoint /workspace/build/centos-stream-8/build-repo.sh \
+  centos-stream-8-pkg-builder
+
+echo "generated repo in build/centos-stream-8/repo"
+
+echo ""
+echo "OK"
