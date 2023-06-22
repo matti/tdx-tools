@@ -30,7 +30,7 @@ for different kernel version support. Please make sure to use the corresponding 
   TDX based confidential computing at zone of `DCesv5` and `ECesv5` series.
 - Google published [Intel Trust Domain Extensions (TDX) Security Review](https://services.google.com/fh/files/misc/intel_tdx_-_full_report_041423.pdf)
 - Please contact Intel sales representative for on-premise bare metal server or processor.
-- None of the w prefixed Xeon processors work despite Sapphire Rapids architecture due to missing (deprecated) SGX feature.
+- None of the w prefixed processors work despite Sapphire Rapids architecture due to missing (deprecated) SGX feature.
 
 ### 1.3 API and Specifications
 
